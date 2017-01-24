@@ -38,17 +38,45 @@ def make_new_student(first_name, last_name, github):
     Given a first name, last name, and GitHub account, add student to the
     database and print a confirmation message.
     """
-    pass
+
+    QUERY = """
+        INSERT INTO students
+            VALUES (:first_name, :last_name, :github)
+        """
+    db.session.execute(QUERY, {'first_name': first_name,
+                               'last_name': last_name,
+                               'github': github})
+
+    db.session.commit()
+    print "Successfully added student: {first_name} {last_name}".format(first_name=first_name,
+                                                                        last_name=last_name)
 
 
 def get_project_by_title(title):
     """Given a project title, print information about the project."""
-    pass
+    QUERY = """
+        SELECT title, description
+            FROM projects
+            WHERE title = :title
+        """
+    db_cursor = db.session.execute(QUERY, {'title': title})
+    row = db_cursor.fetchone()
+    print "{title} is a project about: {description}".format(title=row[0], description=row[1])
+
 
 
 def get_grade_by_github_title(github, title):
     """Print grade student received for a project."""
-    pass
+    QUERY = """
+        SELECT grade, project_title
+        FROM grades
+        WHERE student_github = :student_github
+        AND project_title = :project_title
+        """
+
+    db_cursor = db.session.execute(QUERY, {'student_github': github, 'project_title': title})
+    row = db_cursor.fetchone()
+    print "Student received {grade} for {title} project.".format(grade=row[0], title=row[1])
 
 
 def assign_grade(github, title, grade):
